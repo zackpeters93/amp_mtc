@@ -1,0 +1,162 @@
+datasource postgres {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  createdAt   DateTime     @default(now())
+  firstName   String?
+  id          String       @id @default(cuid())
+  lastName    String?
+  locked      Boolean?
+  password    String
+  roles       String[]
+  technicians Technician[]
+  updatedAt   DateTime     @updatedAt
+  username    String       @unique
+}
+
+model Job {
+  asset           Asset?            @relation(fields: [assetId], references: [id])
+  assetId         String?
+  bonusAllocation String?
+  businessUnit    String?
+  client          Company?          @relation(fields: [clientId], references: [id])
+  clientId        String?
+  comments        String?
+  createdAt       DateTime          @default(now())
+  id              String            @id @default(cuid())
+  jobStatus       EnumJobJobStatus?
+  jobType         String?
+  leadTechnician  String?
+  quote           String?
+  report          String?
+  testData        TestDatum?        @relation(fields: [testDataId], references: [id])
+  testDataId      String?
+  testResults     String?
+  tickets         String?
+  updatedAt       DateTime          @updatedAt
+}
+
+model Company {
+  companyName String?
+  contacts    Contact[]
+  createdAt   DateTime   @default(now())
+  facilities  Facility[]
+  id          String     @id @default(cuid())
+  jobs        Job[]
+  updatedAt   DateTime   @updatedAt
+}
+
+model Contact {
+  assets     Asset[]
+  company    Company?   @relation(fields: [companyId], references: [id])
+  companyId  String?
+  createdAt  DateTime   @default(now())
+  email      String?
+  facilities Facility[]
+  firstName  String?
+  id         String     @id @default(cuid())
+  lastName   String?
+  phone      String?
+  updatedAt  DateTime   @updatedAt
+}
+
+model Facility {
+  address   String?
+  assets    Asset[]
+  city      String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
+  contactId String?
+  country   String?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  location  String?
+  owner     Company? @relation(fields: [ownerId], references: [id])
+  ownerId   String?
+  state     String?
+  updatedAt DateTime @updatedAt
+  zipCode   String?
+}
+
+model Asset {
+  assetName  String?
+  assetType  String?
+  createdAt  DateTime  @default(now())
+  facility   Facility? @relation(fields: [facilityId], references: [id])
+  facilityId String?
+  id         String    @id @default(cuid())
+  jobs       Job[]
+  poc        Contact[]
+  updatedAt  DateTime  @updatedAt
+}
+
+model TestDatum {
+  api             String?
+  contents        String?
+  createdAt       DateTime             @default(now())
+  id              String               @id @default(cuid())
+  imperialMetric  String?
+  jobs            Job[]
+  productLevel    String?
+  productTemp     String?
+  specificGravity String?
+  status          EnumTestDatumStatus?
+  updatedAt       DateTime             @updatedAt
+}
+
+model TankDatum {
+  createdAt         DateTime @default(now())
+  id                String   @id @default(cuid())
+  imperialMetric    String?
+  insulated         String?
+  roofConfig        String?
+  tankDiameter      String?
+  tankHeight        String?
+  tankShellMaterial String?
+  tankType          String?
+  updatedAt         DateTime @updatedAt
+}
+
+model TestResult {
+  comments         String?
+  createdAt        DateTime @default(now())
+  id               String   @id @default(cuid())
+  imperialMetric   String?
+  measuredLeakRate String?
+  result           String?
+  testLength       String?
+  updatedAt        DateTime @updatedAt
+}
+
+model Ticket {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
+
+model Quote {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
+
+model Technician {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+  userId    User?    @relation(fields: [userIdId], references: [id])
+  userIdId  String?
+}
+
+enum EnumJobJobStatus {
+  Option1
+}
+
+enum EnumTestDatumStatus {
+  Option1
+}
